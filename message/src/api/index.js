@@ -80,6 +80,13 @@ export function getCurrentUser() {
   return request.get('/user/current')
 }
 
+// ==================== 日志相关 API ====================
+
+/** 上报访问主页日志（登录系统主页时调用一次） */
+export function reportPageView() {
+  return request.post('/log/page-view')
+}
+
 // ==================== 文件上传 API ====================
 
 /** 上传附件 */

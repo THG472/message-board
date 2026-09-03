@@ -20,7 +20,7 @@ public class OperationLog {
     /** 操作人姓名 */
     private String userName;
 
-    /** 操作类型：CREATE-发布留言, COMMENT-评论, LIKE-点赞, UNLIKE-取消点赞 */
+    /** 操作类型：LOGIN-登录访问主页, VIEW-浏览留言, CREATE-发布留言, COMMENT-评论, LIKE-点赞, UNLIKE-取消点赞 */
     private String operationType;
 
     /** 操作描述 */

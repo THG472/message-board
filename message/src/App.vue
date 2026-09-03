@@ -23,7 +23,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import { getCurrentUser } from './api'
+import { getCurrentUser, reportPageView } from './api'
 
 export default {
   name: 'App',
@@ -46,15 +46,46 @@ export default {
     }
   },
   created() {
-    this.isDetailPage = this.$route.name === 'MessageDetail'
-    const urlUid = this.$route.query.uid
-    if (urlUid) {
-      this.$store.commit('SET_UID', urlUid)
-      // SET_UID 后立即获取用户信息
-      this.fetchUserInfo()
+    const isDetailPageUrl = this.isDetailPageUrl()
+    this.isDetailPage = isDetailPageUrl
+    const uid = this.getUidFromUrl()
+    if (uid) {
+      this.$store.commit('SET_UID', uid)
+    }
+    // 仅整页加载进入主页（留言列表页）时上报一次访问日志（LOGIN）
+    // 点击留言会新开标签页加载详情页（#/detail/...），那不算"登录访问主页"，不重复上报
+    // 注意：不能在 SET_UID 之前调用，否则请求头带不上 uid
+    if (!isDetailPageUrl) {
+      reportPageView().catch(() => {})
     }
   },
   methods: {
+    // 判断当前 URL 是否是详情页，基于 window.location 解析（hash 路由 #/detail/...）
+    // 不依赖 this.$route：App created 执行时 Vue Router 首次导航可能尚未完成
+    isDetailPageUrl() {
+      try {
+        const hash = window.location.hash || ''
+        const path = (hash.split('?')[0] || '').replace(/^#/, '')
+        return path.startsWith('/detail')
+      } catch (e) {
+        return false
+      }
+    },
+    // 从 URL 解析 uid，兼容 hash 内（#/?uid=xxx、#/detail/1?uid=xxx）与 hash 外（?uid=xxx）两种形式
+    // 不依赖 this.$route：App created 执行时 Vue Router 首次导航可能尚未完成，route.query 会取不到
+    getUidFromUrl() {
+      try {
+        const hash = window.location.hash
+        const qIndex = hash.indexOf('?')
+        if (qIndex >= 0) {
+          const hashUid = new URLSearchParams(hash.slice(qIndex + 1)).get('uid')
+          if (hashUid) return hashUid
+        }
+        return new URLSearchParams(window.location.search).get('uid') || ''
+      } catch (e) {
+        return ''
+      }
+    },
     async fetchUserInfo() {
       try {
         const userInfo = await getCurrentUser()

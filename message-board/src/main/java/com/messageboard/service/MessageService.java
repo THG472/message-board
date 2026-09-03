@@ -21,8 +21,10 @@ public interface MessageService {
 
     /**
      * 发布留言
+     *
+     * @return 新留言的ID
      */
-    void publish(MessageDTO dto, String uid);
+    Long publish(MessageDTO dto, String uid);
 
     /**
      * 点赞（已点赞则取消）

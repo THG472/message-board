@@ -137,7 +137,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void publish(MessageDTO dto, String uid) {
+    public Long publish(MessageDTO dto, String uid) {
         // 查询用户信息
         UserInfoDTO userInfo = externalUserService.getUserInfo(uid);
 
@@ -158,6 +158,7 @@ public class MessageServiceImpl implements MessageService {
 
         messageMapper.insert(message);
         log.info("用户 {} 发布了留言：{}", uid, dto.getTitle());
+        return message.getId();
     }
 
     @Override
