@@ -10,9 +10,9 @@ import org.apache.ibatis.annotations.Select;
 public interface ExternalUserMapper {
 
     /**
-     * 根据UID从syngbs.manex表查询用户姓名和机构ID
+     * 根据UID从syngbs.manex表查询用户姓名、机构ID和身份证号（sfzh 用于页面水印）
      */
-    @Select("SELECT xm AS userName, jgid FROM syngbs.manex WHERE id = #{uid} LIMIT 1")
+    @Select("SELECT xm AS userName, jgid, sfzh FROM syngbs.manex WHERE id = #{uid} LIMIT 1")
     UserInfoDTO selectUserByUid(@Param("uid") String uid);
 
     /**

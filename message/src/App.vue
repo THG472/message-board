@@ -18,22 +18,28 @@
         <router-view />
       </el-main>
     </el-container>
+    <!-- 全局页面水印：姓名 / 身份证号 / 访问时间（按服务器时间校准），浅色不遮挡内容 -->
+    <watermark :user-name="currentUserName" :sfzh="currentSfzh" :time-offset="serverTimeOffset" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { getCurrentUser, reportPageView } from './api'
+import { getCurrentUser, reportPageView, getServerTime } from './api'
+import Watermark from './components/Watermark.vue'
 
 export default {
   name: 'App',
+  components: { Watermark },
   data() {
     return {
-      isDetailPage: false
+      isDetailPage: false,
+      // 服务器时间与本地时间的偏移量（毫秒），用于校准水印时间
+      serverTimeOffset: 0
     }
   },
   computed: {
-    ...mapState(['currentUid', 'currentUserName', 'currentOrgName'])
+    ...mapState(['currentUid', 'currentUserName', 'currentSfzh', 'currentOrgName'])
   },
   watch: {
     '$route.name'(val) {
@@ -58,8 +64,24 @@ export default {
     if (!isDetailPageUrl) {
       reportPageView().catch(() => {})
     }
+    // 校准水印时间：获取服务器时间，计算与本地时钟的偏移量（减去一半往返耗时以修正网络延迟）
+    this.syncServerTime()
   },
   methods: {
+    /** 拉取服务器时间并计算偏移量，失败时保持偏移为 0（水印退化为本地时间） */
+    async syncServerTime() {
+      const t0 = Date.now()
+      try {
+        const serverTime = await getServerTime()
+        if (typeof serverTime === 'number') {
+          const rtt = Date.now() - t0
+          // 假设请求/响应耗时各占一半，服务器时间对应本地 t0 + rtt/2 时刻
+          this.serverTimeOffset = serverTime - (t0 + rtt / 2)
+        }
+      } catch (e) {
+        // 获取失败不阻塞页面，水印使用本地时间
+      }
+    },
     // 判断当前 URL 是否是详情页，基于 window.location 解析（hash 路由 #/detail/...）
     // 不依赖 this.$route：App created 执行时 Vue Router 首次导航可能尚未完成
     isDetailPageUrl() {

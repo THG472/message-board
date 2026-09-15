@@ -25,6 +25,7 @@ public class ExternalUserServiceImpl implements ExternalUserService {
                 UserInfoDTO fallback = new UserInfoDTO();
                 fallback.setUserName("未知用户");
                 fallback.setJgid("");
+                fallback.setSfzh("");
                 fallback.setOrgName("");
                 return fallback;
             }
@@ -39,6 +40,7 @@ public class ExternalUserServiceImpl implements ExternalUserService {
             UserInfoDTO fallback = new UserInfoDTO();
             fallback.setUserName("未知用户");
             fallback.setJgid("");
+            fallback.setSfzh("");
             fallback.setOrgName("");
             return fallback;
         }

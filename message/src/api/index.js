@@ -87,6 +87,11 @@ export function reportPageView() {
   return request.post('/log/page-view')
 }
 
+/** 获取服务器当前时间戳（毫秒），用于校准水印时间 */
+export function getServerTime() {
+  return request.get('/log/server-time')
+}
+
 // ==================== 文件上传 API ====================
 
 /** 上传附件 */

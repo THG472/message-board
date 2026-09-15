@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     currentUid: '',      // 当前登录用户UID
     currentUserName: '', // 当前登录用户姓名(xm)
+    currentSfzh: '',     // 当前登录用户身份证号(sfzh，用于页面水印)
     currentOrgName: ''   // 当前登录用户机构名称
   },
   mutations: {
@@ -15,6 +16,7 @@ export default new Vuex.Store({
     },
     SET_USER_INFO(state, userInfo) {
       state.currentUserName = userInfo.userName || ''
+      state.currentSfzh = userInfo.sfzh || ''
       state.currentOrgName = userInfo.orgName || ''
     }
   },
